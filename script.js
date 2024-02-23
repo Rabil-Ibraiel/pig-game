@@ -4,14 +4,15 @@ const current0 = document.getElementById("current--0");
 const current1 = document.getElementById("current--1");
 const score0 = document.getElementById("score--0");
 const score1 = document.getElementById("score--1");
-let playerTurn = document.querySelector(".player--active").classList[1];
+const player0 = document.querySelector(".player--0");
+const player1 = document.querySelector(".player--1");
+let playerTurn = 0;
+let score = [0, 0];
 
 let img = document.querySelector(".dice");
 img.style.display = "none";
 
 let total = 0;
-let playerOneScore = 0;
-let playerTwoScore = 0;
 
 document.querySelector(".btn--roll").addEventListener("click", () => {
   let randNumber = Math.floor(Math.random() * 6 + 1);
@@ -20,90 +21,63 @@ document.querySelector(".btn--roll").addEventListener("click", () => {
 
   if (randNumber == 1) {
     total = 0;
-    if (playerTurn == "player--0") {
-      playerOneScore = 0;
-      current0.textContent = 0;
-    } else {
-      playerTwoScore = 0;
-      current1.textContent = 0;
-    }
-    nextPlayerTurn();
+    document.getElementById(`current--${playerTurn}`).textContent = 0;
+    document.getElementById(`score--${playerTurn}`).textContent = 0;
+    score[playerTurn] = 0;
+    player0.classList.toggle("player--active");
+    player1.classList.toggle("player--active");
+    playerTurn = playerTurn == 0 ? 1 : 0;
   } else {
-    total = randNumber;
-    score(total);
+    total += randNumber;
+    document.getElementById(`current--${playerTurn}`).textContent = total;
+    winCheck();
   }
 });
 
 document.querySelector(".btn--hold").addEventListener("click", () => {
-  if (playerTurn == "player--0") {
-    score0.textContent = playerOneScore;
-    nextPlayerTurn();
-  } else {
-    score1.textContent = playerTwoScore;
-    nextPlayerTurn();
+  score[playerTurn] += total;
+  score0.textContent = score[0];
+  score1.textContent = score[1];
+
+  if (score[playerTurn] >= 100) {
+    document.querySelectorAll(".btn").forEach((item, index) => {
+      if (index > 0) {
+        item.setAttribute("disabled", "");
+      }
+    });
+    document
+      .querySelector(`.player--${playerTurn}`)
+      .classList.add("player--winner");
+
+    img.style.display = "none";
+    return;
   }
+
   total = 0;
+  player0.classList.toggle("player--active");
+  player1.classList.toggle("player--active");
+  document.getElementById(`current--${playerTurn}`).textContent = 0;
+  playerTurn = playerTurn == 0 ? 1 : 0;
 });
 
-function score(total) {
-  if (playerTurn == "player--0") {
-    playerOneScore += total;
-    current0.textContent = playerOneScore;
-    winCheck(playerOneScore);
-  } else {
-    playerTwoScore += total;
-    current1.textContent = playerTwoScore;
-    winCheck(playerTwoScore);
-  }
-  total = 0;
-}
-
-function nextPlayerTurn() {
-  const playerOneSection = document.querySelector(".player--0");
-  const playerTwoSection = document.querySelector(".player--1");
-  if (playerTurn == "player--0") {
-    playerOneSection.classList.remove("player--active");
-    playerTwoSection.classList.add("player--active");
-    playerTurn = document.querySelector(".player--active").classList[1];
-  } else {
-    playerTwoSection.classList.remove("player--active");
-    playerOneSection.classList.add("player--active");
-    playerTurn = document.querySelector(".player--active").classList[1];
-  }
-}
-
 function newGame() {
-  current0.innerHTML = 0;
-  current1.innerHTML = 0;
-  score0.innerHTML = 0;
-  score1.innerHTML = 0;
+  current0.textContent = 0;
+  current1.textContent = 0;
+  score0.textContent = 0;
+  score1.textContent = 0;
+  score = [0, 0];
   total = 0;
-  playerOneScore = 0;
-  playerTwoScore = 0;
-  if (playerTurn == "player--1") {
-    nextPlayerTurn();
+  player0.classList.remove("player--winner");
+  player1.classList.remove("player--winner");
+
+  if (!player0.classList.contains("player--active")) {
+    player0.classList.toggle("player--active");
+    player1.classList.toggle("player--active");
   }
+  playerTurn = 0;
+  document.querySelectorAll(".btn").forEach((item) => {
+    item.removeAttribute("disabled");
+  });
 }
 
 document.querySelector(".btn--new").addEventListener("click", newGame);
-
-function winCheck(total) {
-  if (total >= 100) {
-    console.log(total);
-
-    document.querySelectorAll(".btn").forEach((item) => {
-      item.setAttribute("disabled", "");
-    });
-
-    if (playerTurn == "player--0") {
-      score0.innerHTML = total;
-    } else {
-      score1.innerHTML = total;
-    }
-
-    document.querySelector(".player--winner").style.display = "flex";
-    document.getElementById("winner-name").innerHTML = `${
-      playerTurn == "player--0" ? "Player 1" : "Player 2"
-    } Win the game!`;
-  }
-}
