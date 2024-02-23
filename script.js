@@ -9,9 +9,8 @@ let playerTurn = document.querySelector(".player--active").classList[1];
 document.querySelector(".btn--roll").addEventListener("click", () => {
   let randNumber = Math.floor(Math.random() * 6 + 1);
   img.style.display = "block";
-  img.src = `file:///C:/Users/Rabil/Desktop/Projects-js-course/pig-game/images/dice-${randNumber}.png`;
-  let playerOneScore = 0;
-  let playerTwoScore = 0;
+  img.src = `https://raw.githubusercontent.com/Rabil-Ibraiel/pig-game/main/images/dice-${randNumber}.png`;
+
   let total = 0;
 
   if (randNumber == 1) {
